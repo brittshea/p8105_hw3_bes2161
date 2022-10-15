@@ -1,0 +1,6 @@
+---
+title: "p8105_hw3_bes2161.Rmd"
+author: "Brittany Shea"
+date: "`r Sys.Date()`"
+output: github_document
+---
