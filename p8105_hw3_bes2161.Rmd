@@ -7,6 +7,8 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(tidyr)
+library(lubridate)
 library(ggridges)
 library(patchwork)
 library(p8105.datasets)
@@ -91,3 +93,42 @@ instacart %>%
   knitr::kable(digits = 2)
 ```
 
+### Problem 2
+
+#### Read in and clean the data 
+
+```{r}
+accel_data = 
+  read_csv("./data/accel_data.csv") %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "minute",
+    names_prefix = "activity_",
+    values_to = "activity_count") %>%
+  mutate(wday_wend = ifelse(day %in% c("Saturday", "Sunday"), "weekend", "weekday"))
+```
+
+This dataset includes 50,400 rows and 6 total columns. The variables include the week number, day id, day of the week, activity count for each minute of a 24-hour day starting at midnight, and whether the day is during the week or on a weekend. 
+
+#### Table showing total activity variable for each day
+
+```{r}
+accel_data %>% 
+  group_by(day_id) %>% 
+  summarize(sum(activity_count)) %>% 
+  knitr::kable(digits = 2)
+```
+
+It appears that activity decreases toward the beginning of the week; for example, Tuesdays appear to be a day with less activity compared to other days. However, activity seems to be higher on the weekends. 
+
+#### Single-panel plot showing the 24-hour activity time courses for each day
+
+```{r}
+accel_data %>% 
+  group_by(day_id) %>% 
+  ggplot(aes(x = minute, y = activity_count)) + 
+  geom_line(aes(color = day))
+```
+
+This graph shows there are peaks and dips in activity levels throughout the day. Activity increases in the beginning of the day, then decreases, and picks up again towards the end of the day. It also appears that activity is generally higher on weekends compared to weekdays. 
